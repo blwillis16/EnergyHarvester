@@ -1,0 +1,145 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:weightSum="1">
+
+    <com.jjoe64.graphview.GraphView
+        android:layout_width="match_parent"
+        android:layout_height="200dip"
+        android:id="@+id/graph"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/PowerField" />
+
+    <ImageButton
+        android:layout_width="70dp"
+        android:layout_height="80dp"
+        android:id="@+id/homeBtn"
+
+        android:background="@null"
+        android:src="@mipmap/home_1"
+        android:contentDescription="Home Button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+    <ImageButton
+        android:layout_width="70dp"
+        android:layout_height="80dp"
+        android:id="@+id/piezoButton"
+        android:background="@null"
+        android:src="@mipmap/piezo_1"
+        android:layout_gravity="right"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/homeBtn"
+        android:layout_toEndOf="@+id/homeBtn" />
+
+
+
+    <ImageButton
+        android:layout_width="70dp"
+        android:layout_height="80dp"
+        android:id="@+id/solarButton"
+        android:background="@null"
+        android:src="@mipmap/solar1"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/thermalButton"
+        android:layout_toStartOf="@+id/thermalButton" />
+
+    <ImageButton
+        android:layout_width="70dp"
+        android:layout_height="80dp"
+        android:id="@+id/thermalButton"
+        android:src="@mipmap/thermal_1"
+        android:background="@null"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Database"
+        android:id="@+id/viewDatabasebutton"
+        android:layout_above="@+id/homeBtn"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="71dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Voltage"
+        android:id="@+id/textView2"
+        android:layout_above="@+id/addDataButton"
+        android:layout_alignRight="@+id/textView4"
+        android:layout_alignEnd="@+id/textView4" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Power"
+        android:id="@+id/textView3"
+        android:layout_alignBottom="@+id/PowerField"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignStart="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Current"
+        android:id="@+id/textView4"
+        android:layout_above="@+id/piezoButton"
+        android:layout_toRightOf="@+id/viewDatabasebutton"
+        android:layout_toEndOf="@+id/viewDatabasebutton" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/VoltageField"
+        android:layout_above="@+id/addDataButton"
+        android:layout_toRightOf="@+id/textView4"
+        android:layout_alignRight="@+id/CurrentField"
+        android:layout_alignEnd="@+id/CurrentField" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/PowerField"
+        android:layout_above="@+id/VoltageField"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/textView2"
+        android:layout_toEndOf="@+id/textView2" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/CurrentField"
+        android:layout_alignTop="@+id/textView4"
+        android:layout_alignRight="@+id/thermalButton"
+        android:layout_alignEnd="@+id/thermalButton"
+        android:layout_toRightOf="@+id/textView3"
+        android:layout_toEndOf="@+id/textView3" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Data"
+        android:id="@+id/addDataButton"
+        android:layout_alignBottom="@+id/textView4"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+</RelativeLayout>
+
+
