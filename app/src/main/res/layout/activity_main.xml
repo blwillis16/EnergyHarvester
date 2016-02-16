@@ -78,8 +78,8 @@
         android:text="Voltage"
         android:id="@+id/textView2"
         android:layout_above="@+id/addDataButton"
-        android:layout_alignRight="@+id/textView4"
-        android:layout_alignEnd="@+id/textView4" />
+        android:layout_alignRight="@+id/textView3"
+        android:layout_alignEnd="@+id/textView3" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -88,8 +88,8 @@
         android:text="Power"
         android:id="@+id/textView3"
         android:layout_alignBottom="@+id/PowerField"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_alignStart="@+id/textView2" />
+        android:layout_toLeftOf="@+id/PowerField"
+        android:layout_toStartOf="@+id/PowerField" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -97,18 +97,19 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Current"
         android:id="@+id/textView4"
-        android:layout_above="@+id/piezoButton"
-        android:layout_toRightOf="@+id/viewDatabasebutton"
-        android:layout_toEndOf="@+id/viewDatabasebutton" />
+        android:layout_alignBottom="@+id/CurrentField"
+        android:layout_alignRight="@+id/textView3"
+        android:layout_alignEnd="@+id/textView3" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/VoltageField"
-        android:layout_above="@+id/addDataButton"
-        android:layout_toRightOf="@+id/textView4"
-        android:layout_alignRight="@+id/CurrentField"
-        android:layout_alignEnd="@+id/CurrentField" />
+        android:layout_above="@+id/CurrentField"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignLeft="@+id/PowerField"
+        android:layout_alignStart="@+id/PowerField" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -117,18 +118,18 @@
         android:layout_above="@+id/VoltageField"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_toRightOf="@+id/textView2"
-        android:layout_toEndOf="@+id/textView2" />
+        android:layout_toRightOf="@+id/solarButton"
+        android:layout_toEndOf="@+id/solarButton" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/CurrentField"
-        android:layout_alignTop="@+id/textView4"
-        android:layout_alignRight="@+id/thermalButton"
-        android:layout_alignEnd="@+id/thermalButton"
-        android:layout_toRightOf="@+id/textView3"
-        android:layout_toEndOf="@+id/textView3" />
+        android:layout_above="@+id/thermalButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignLeft="@+id/VoltageField"
+        android:layout_alignStart="@+id/VoltageField" />
 
     <Button
         android:layout_width="wrap_content"

@@ -23,11 +23,20 @@ public class MainActivity extends AppCompatActivity {
     DatabaseHelper myDb;
     Button viewDatabase;
     EditText editPower, editVoltage, editCurrent;
+    String tableType = "";
     Button addDataBtn;
     BarGraphSeries<DataPoint> thermalSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {
             new DataPoint(0,0),
     });
-
+    BarGraphSeries<DataPoint> totalSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {
+            new DataPoint(0,0),
+    });
+    BarGraphSeries<DataPoint> solarSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {
+            new DataPoint(0,0),
+    });
+    BarGraphSeries<DataPoint> piezoSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {
+            new DataPoint(0,0),
+    });
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                          boolean dataInserted =  myDb.insertData(editPower.getText().toString(),
+                          boolean dataInserted =  myDb.insertData(tableType,editPower.getText().toString(),
                                   editVoltage.getText().toString(),
                                   editCurrent.getText().toString());
                         //sends message was inserted
@@ -73,19 +82,22 @@ public class MainActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Cursor res = myDb.getData();
+
+                        Cursor res = myDb.getTotalData();
+
                         if (res.getCount() == 0) {
-                            //show message if database has not buttons
+                            //show message if database has no data
                             showMessage("error", "no data");
                             return;
                         }
                         StringBuffer buffer = new StringBuffer();
+
                         while (res.moveToNext()) {
                             buffer.append("ID: " + res.getString(0) + "\n");
-                            //buffer.append("DateTime: "+ res.getString(1)+ "\n");
-                            buffer.append("Power: " + res.getString(3) + "\n");
-                            buffer.append("Voltage: " + res.getString(4) + "\n");
-                            buffer.append("Current: " + res.getString(5) + "\n\n");
+                            buffer.append("DateTime: "+ res.getString(1)+ "\n");
+                            buffer.append("Power: " + res.getString(2) + "\n");
+                            buffer.append("Voltage: " + res.getString(3) + "\n");
+                            buffer.append("Current: " + res.getString(4) + "\n\n");
                         }
                         //show all data
                         showMessage("Data", buffer.toString());
@@ -121,31 +133,27 @@ public class MainActivity extends AppCompatActivity {
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tableType = "total";
                 //makes home graph
                 //resets graph
                 graph.removeAllSeries();
-                //creates new data points
-                BarGraphSeries<DataPoint> homeSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {
-                        new DataPoint(0,0),
-                        new DataPoint(1,5),
-
-                });
+                addEntry();
                 graph.setTitle("Total Harvester Power vs Time");
-                homeSeries.setColor(Color.GREEN);
-                graph.addSeries(homeSeries);
+                totalSeries.setColor(Color.GREEN);
+                graph.addSeries(totalSeries);
             }
         });
         //adds onclick listener to thermal button
         thermalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tableType = "thermal";
                 //when clicked creates current thermal graph
                 //data points
                 graph.removeAllSeries();
                 //generate new points
-                addEntry();
-
-                graph.setTitle("Piezo Harvester Power vs Time");
+           //     addEntry();
+                graph.setTitle("Thermal Harvester Power vs Time");
                 thermalSeries.setColor(Color.RED);
                 graph.addSeries(thermalSeries);
 
@@ -154,13 +162,9 @@ public class MainActivity extends AppCompatActivity {
         piezoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                tableType = "piezo";
                 graph.removeAllSeries();
-                //generate new points
-                BarGraphSeries<DataPoint> piezoSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {
-                        new DataPoint(0, 0),
-                        new DataPoint(1, 5)
-                });
+               // addEntry
                 graph.setTitle("Piezo Harvester Power vs Time");
                 piezoSeries.setColor(Color.BLUE);
                 piezoSeries.setSpacing(50);
@@ -170,13 +174,11 @@ public class MainActivity extends AppCompatActivity {
         solarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tableType = "solar";
                 //resets graph
                 graph.removeAllSeries();
+               // addEntry();
                 //adds new data points
-                BarGraphSeries<DataPoint> solarSeries = new BarGraphSeries<DataPoint>(new DataPoint[]{
-                        new DataPoint(0, 0),
-                        new DataPoint(1, 5)
-                });
                 graph.setTitle("Solar Harvester Power vs Time");
                 solarSeries.setColor(Color.YELLOW);
                 graph.addSeries(solarSeries);
@@ -195,21 +197,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addEntry() {
+        double doublePower = 0.0;
 
-        Cursor resultTable = myDb.getData();
-        resultTable.moveToLast();
-        int doublePower = Integer.parseInt(resultTable.getString(3));
-        thermalSeries.appendData(new DataPoint(1, doublePower), true, 2);
-
+        if(tableType.equals("total")) {
+            Cursor resultTable = myDb.getTotalData();
+            resultTable.moveToLast();
+            doublePower = Integer.parseInt(resultTable.getString(3));
+            totalSeries.appendData(new DataPoint(1, doublePower), true, 2);
+        }
+        if(tableType.equals("piezo")) {
+            Cursor resultTable = myDb.getTotalData();
+            resultTable.moveToLast();
+            doublePower = Integer.parseInt(resultTable.getString(3));
+            piezoSeries.appendData(new DataPoint(1, doublePower), true, 2);
+        }
+        if(tableType.equals("thermal")) {
+            Cursor resultTable = myDb.getTotalData();
+            resultTable.moveToLast();
+            doublePower = Integer.parseInt(resultTable.getString(3));
+            thermalSeries.appendData(new DataPoint(1, doublePower), true, 2);
+        }
+        if(tableType.equals("solar")) {
+            Cursor resultTable = myDb.getTotalData();
+            resultTable.moveToLast();
+            doublePower = Integer.parseInt(resultTable.getString(3));
+            solarSeries.appendData(new DataPoint(1, doublePower), true, 2);
+        }
     }
 
-//        while(resultTable.moveToFirst()) {
-//            int doublePower = Integer.parseInt(resultTable.getString(3));
-//            thermalSeries.appendData(new DataPoint(1, doublePower), true, 1);
-//
-//        }
-//    }
- //   @Override
+
+//   @Override
 //    protected void onResume() {
 //        super.onResume();
 //       //thread that appends data to chart
