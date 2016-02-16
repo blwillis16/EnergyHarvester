@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         addData();
         //creates method for view data button
         viewData();
+
+
     }
     public void addData(){
         addDataBtn.setOnClickListener(
@@ -87,24 +90,81 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        Cursor res = myDb.getTotalData();
-
-                        if (res.getCount() == 0) {
-                            //show message if database has no data
-                            showMessage("error", "no data");
-                            return;
-                        }
                         StringBuffer buffer = new StringBuffer();
+                        if (tableType.equals("total")) {
+                            Cursor res1 = myDb.getTotalData();
 
-                        while (res.moveToNext()) {
-                            buffer.append("ID: " + res.getString(0) + "\n");
-                            buffer.append("DateTime: "+ res.getString(1)+ "\n");
-                            buffer.append("Power: " + res.getString(2) + "\n");
-                            buffer.append("Voltage: " + res.getString(3) + "\n");
-                            buffer.append("Current: " + res.getString(4) + "\n\n");
+                            if (res1.getCount() == 0) {
+                                //show message if database has no data
+                                showMessage("error", "no data");
+                                return;
+                            }
+
+                            while (res1.moveToNext()) {
+                                buffer.append("ID: " + res1.getString(0) + "\n");
+                                buffer.append("DateTime: " + res1.getString(1) + "\n");
+                                buffer.append("Power: " + res1.getString(2) + "\n");
+                                buffer.append("Voltage: " + res1.getString(3) + "\n");
+                                buffer.append("Current: " + res1.getString(4) + "\n\n");
+                            }
+                        }
+                        if (tableType.equals("piezo")) {
+                            Cursor res2 = myDb.getPiezoData();
+
+                            if (res2.getCount() == 0) {
+                                //show message if database has no data
+                                showMessage("error", "no data");
+                                return;
+                            }
+
+                            while (res2.moveToNext()) {
+                                buffer.append("ID: " + res2.getString(0) + "\n");
+                                buffer.append("DateTime: " + res2.getString(1) + "\n");
+                                buffer.append("Power: " + res2.getString(2) + "\n");
+                                buffer.append("Voltage: " + res2.getString(3) + "\n");
+                                buffer.append("Current: " + res2.getString(4) + "\n\n");
+                            }
+
+
+                        }
+                        if (tableType.equals("thermal")) {
+                            Cursor res3 = myDb.getThermalData();
+
+                            if (res3.getCount() == 0) {
+                                //show message if database has no data
+                                showMessage("error", "no data");
+                                return;
+                            }
+
+                            while (res3.moveToNext()) {
+                                buffer.append("ID: " + res3.getString(0) + "\n");
+                                buffer.append("DateTime: " + res3.getString(1) + "\n");
+                                buffer.append("Power: " + res3.getString(2) + "\n");
+                                buffer.append("Voltage: " + res3.getString(3) + "\n");
+                                buffer.append("Current: " + res3.getString(4) + "\n\n");
+                            }
+
+                        }
+                        if (tableType.equals("solar")) {
+                            Cursor res4 = myDb.getSolarData();
+
+                            if (res4.getCount() == 0) {
+                                //show message if database has no data
+                                showMessage("error", "no data");
+                                return;
+                            }
+
+                            while (res4.moveToNext()) {
+                                buffer.append("ID: " + res4.getString(0) + "\n");
+                                buffer.append("DateTime: " + res4.getString(1) + "\n");
+                                buffer.append("Power: " + res4.getString(2) + "\n");
+                                buffer.append("Voltage: " + res4.getString(3) + "\n");
+                                buffer.append("Current: " + res4.getString(4) + "\n\n");
+                            }
                         }
                         //show all data
                         showMessage("Data", buffer.toString());
+
                     }
                 }
         );
@@ -146,6 +206,8 @@ public class MainActivity extends AppCompatActivity {
                 graph.addSeries(totalSeries);
             }
         });
+
+
         //adds onclick listener to thermal button
         thermalButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -197,10 +259,11 @@ public class MainActivity extends AppCompatActivity {
         addDataBtn = (Button)findViewById(R.id.addDataButton);
         viewDatabase = (Button)findViewById(R.id.viewDatabasebutton);
 
+
     }
     private void addEntry() {
         double doublePower;
-
+        
         if(tableType.equals("total")) {
             Cursor resultTable = myDb.getTotalData();
             resultTable.moveToLast();
