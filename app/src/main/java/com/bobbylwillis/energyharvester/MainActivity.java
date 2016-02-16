@@ -68,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
                         //if not data was inserted, send error message
                         else
                             Toast.makeText(MainActivity.this, "Data not Inserted", Toast.LENGTH_LONG).show();
+                        editPower.setText("");
+                        editVoltage.setText("");
+                        editCurrent.setText("");
+
 
                     }
                 }
@@ -114,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
     private void createButtons(){
         //creates graph variable connected with graph object
         final GraphView graph = (GraphView) findViewById(R.id.graph);
@@ -195,9 +198,8 @@ public class MainActivity extends AppCompatActivity {
         viewDatabase = (Button)findViewById(R.id.viewDatabasebutton);
 
     }
-
     private void addEntry() {
-        double doublePower = 0.0;
+        double doublePower;
 
         if(tableType.equals("total")) {
             Cursor resultTable = myDb.getTotalData();
