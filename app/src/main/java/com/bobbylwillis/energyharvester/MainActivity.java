@@ -26,22 +26,13 @@ public class MainActivity extends AppCompatActivity {
     EditText editPower, editVoltage, editCurrent;
     String tableType = "";
     Button addDataBtn;
-    BarGraphSeries<DataPoint> thermalSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {
-            new DataPoint(0,0),
-    });
-    BarGraphSeries<DataPoint> totalSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {
-            new DataPoint(0,0),
-    });
-    BarGraphSeries<DataPoint> solarSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {
-            new DataPoint(0,0),
-    });
-    BarGraphSeries<DataPoint> piezoSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {
-            new DataPoint(0,0),
-    });
+    BarGraphSeries<DataPoint> thermalSeries = new BarGraphSeries<DataPoint>(new DataPoint[]{new DataPoint(0,0)});
+    BarGraphSeries<DataPoint> totalSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
+    BarGraphSeries<DataPoint> solarSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
+    BarGraphSeries<DataPoint> piezoSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         //sets app orientation to portrait
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -53,7 +44,10 @@ public class MainActivity extends AppCompatActivity {
         addData();
         //creates method for view data button
         viewData();
-
+        myDb.insertData("total", "0", "0", "0");
+        myDb.insertData("piezo", "0", "0", "0");
+        myDb.insertData("thermal", "0", "0", "0");
+        myDb.insertData("solar", "0", "0", "0");
 
     }
     public void addData(){
@@ -61,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (editPower.getText().toString() == ""|| editVoltage.getText().toString() == "" ||editCurrent.getText().toString() =="" ){
+                            Toast.makeText(MainActivity.this, "Text fields left empty. Please enter a numerical value.", Toast.LENGTH_LONG).show();
+                        }
                           boolean dataInserted =  myDb.insertData(tableType,editPower.getText().toString(),
                                   editVoltage.getText().toString(),
                                   editCurrent.getText().toString());
@@ -200,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                 //makes home graph
                 //resets graph
                 graph.removeAllSeries();
-                addEntry();
+                //addEntry();
                 graph.setTitle("Total Harvester Power vs Time");
                 totalSeries.setColor(Color.GREEN);
                 graph.addSeries(totalSeries);
@@ -217,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
                 //data points
                 graph.removeAllSeries();
                 //generate new points
-           //     addEntry();
+               // addEntry();
                 graph.setTitle("Thermal Harvester Power vs Time");
                 thermalSeries.setColor(Color.RED);
                 graph.addSeries(thermalSeries);
@@ -229,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 tableType = "piezo";
                 graph.removeAllSeries();
-               // addEntry
+              //  addEntry();
                 graph.setTitle("Piezo Harvester Power vs Time");
                 piezoSeries.setColor(Color.BLUE);
                 piezoSeries.setSpacing(50);
@@ -263,60 +260,61 @@ public class MainActivity extends AppCompatActivity {
     }
     private void addEntry() {
         double doublePower;
-        
+
         if(tableType.equals("total")) {
             Cursor resultTable = myDb.getTotalData();
             resultTable.moveToLast();
-            doublePower = Integer.parseInt(resultTable.getString(3));
-            totalSeries.appendData(new DataPoint(1, doublePower), true, 2);
+            doublePower = Integer.parseInt(resultTable.getString(2));
+            totalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
+            //totalSeries.appendData(new DataPoint(1, doublePower), true, 2);
         }
         if(tableType.equals("piezo")) {
-            Cursor resultTable = myDb.getTotalData();
+            Cursor resultTable = myDb.getPiezoData();
             resultTable.moveToLast();
-            doublePower = Integer.parseInt(resultTable.getString(3));
-            piezoSeries.appendData(new DataPoint(1, doublePower), true, 2);
+            doublePower = Integer.parseInt(resultTable.getString(2));
+            piezoSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
         }
         if(tableType.equals("thermal")) {
-            Cursor resultTable = myDb.getTotalData();
+            Cursor resultTable = myDb.getThermalData();
             resultTable.moveToLast();
-            doublePower = Integer.parseInt(resultTable.getString(3));
-            thermalSeries.appendData(new DataPoint(1, doublePower), true, 2);
+            doublePower = Integer.parseInt(resultTable.getString(2));
+            thermalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
         }
         if(tableType.equals("solar")) {
-            Cursor resultTable = myDb.getTotalData();
+            Cursor resultTable = myDb.getSolarData();
             resultTable.moveToLast();
-            doublePower = Integer.parseInt(resultTable.getString(3));
-            solarSeries.appendData(new DataPoint(1, doublePower), true, 2);
+            doublePower = Integer.parseInt(resultTable.getString(2));
+            solarSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
         }
     }
 
 
-//   @Override
-//    protected void onResume() {
-//        super.onResume();
-//       //thread that appends data to chart
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                //100 data points
-//                for (int i = 0; i<100; i++){
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            addEntry();
-//                        }
-//                    });
-//                    //Sleep added to slow down additions to graph
-//                    try {
-//                        Thread.sleep(600);
-//                    } catch (InterruptedException e) {
-//                       // e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }).start();
-//
-//    }
+   @Override
+    protected void onResume() {
+        super.onResume();
+       //thread that appends data to chart
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //100 data points
+                for (int i = 0; i<100; i++){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            addEntry();
+                        }
+                    });
+                    //Sleep added to slow down additions to graph
+                    try {
+                        Thread.sleep(600);
+                    } catch (InterruptedException e) {
+                       // e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
