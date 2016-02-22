@@ -57,6 +57,25 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         if (editPower.getText().toString() == ""|| editVoltage.getText().toString() == "" ||editCurrent.getText().toString() =="" ){
                             Toast.makeText(MainActivity.this, "Text fields left empty. Please enter a numerical value.", Toast.LENGTH_LONG).show();
+                            editPower.setText("");
+                            editVoltage.setText("");
+                            editCurrent.setText("");
+                            return;
+                        }
+                        try
+                        {
+                            // the String to int conversion happens here
+                            int checkPowerNumber = Integer.parseInt(editPower.getText().toString().trim());
+                            int checkVoltageNumber = Integer.parseInt(editVoltage.getText().toString().trim());
+                            int checkCurrentNumber = Integer.parseInt(editCurrent.getText().toString().trim());
+                        }
+                        catch (NumberFormatException nfe)
+                        {
+                            Toast.makeText(MainActivity.this, "Inserted value is not a valid number. Please enter a number.", Toast.LENGTH_LONG).show();
+                            editPower.setText("");
+                            editVoltage.setText("");
+                            editCurrent.setText("");
+                            return;
                         }
                           boolean dataInserted =  myDb.insertData(tableType,editPower.getText().toString(),
                                   editVoltage.getText().toString(),
