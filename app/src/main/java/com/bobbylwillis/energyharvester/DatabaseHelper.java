@@ -14,8 +14,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public static final String databaseName = "Harvester.db";
     public static final String tableName1  =  "total_table";
     public static final String tableName2  =  "piezo_table";
-    public static final String tableName4  =  "thermal_table";
     public static final String tableName3  =  "solar_table";
+    public static final String tableName4  =  "thermal_table";
 
     public static final String column1 = "ID";
     public static final String column2  = "created at";
@@ -101,12 +101,12 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         Cursor results2 = db.rawQuery("select * from " + tableName2, null);
         return results2;
     }
-    public Cursor getThermalData(){
+    public Cursor getSolarData(){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor results3 = db.rawQuery("select * from " + tableName3, null);
         return results3;
     }
-    public Cursor getSolarData(){
+    public Cursor getThermalData(){
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor results4 = db.rawQuery("select * from " + tableName4, null);
         return results4;

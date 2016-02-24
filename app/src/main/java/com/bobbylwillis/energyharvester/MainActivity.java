@@ -65,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
                         try
                         {
                             // the String to int conversion happens here
-                            int checkPowerNumber = Integer.parseInt(editPower.getText().toString().trim());
-                            int checkVoltageNumber = Integer.parseInt(editVoltage.getText().toString().trim());
-                            int checkCurrentNumber = Integer.parseInt(editCurrent.getText().toString().trim());
+                            double checkPowerNumber = Double.parseDouble(editPower.getText().toString().trim());
+                            double checkVoltageNumber = Double.parseDouble(editVoltage.getText().toString().trim());
+                            double checkCurrentNumber = Double.parseDouble(editCurrent.getText().toString().trim());
                         }
                         catch (NumberFormatException nfe)
                         {
@@ -213,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 tableType = "total";
-                //makes home graph
                 //resets graph
                 graph.removeAllSeries();
                 //addEntry();
@@ -283,26 +282,26 @@ public class MainActivity extends AppCompatActivity {
         if(tableType.equals("total")) {
             Cursor resultTable = myDb.getTotalData();
             resultTable.moveToLast();
-            doublePower = Integer.parseInt(resultTable.getString(2));
+            doublePower = Double.parseDouble(resultTable.getString(2));
             totalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
             //totalSeries.appendData(new DataPoint(1, doublePower), true, 2);
         }
         if(tableType.equals("piezo")) {
             Cursor resultTable = myDb.getPiezoData();
             resultTable.moveToLast();
-            doublePower = Integer.parseInt(resultTable.getString(2));
+            doublePower = Double.parseDouble(resultTable.getString(2));
             piezoSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
         }
         if(tableType.equals("thermal")) {
             Cursor resultTable = myDb.getThermalData();
             resultTable.moveToLast();
-            doublePower = Integer.parseInt(resultTable.getString(2));
+            doublePower = Double.parseDouble(resultTable.getString(2));
             thermalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
         }
         if(tableType.equals("solar")) {
             Cursor resultTable = myDb.getSolarData();
             resultTable.moveToLast();
-            doublePower = Integer.parseInt(resultTable.getString(2));
+            doublePower = Double.parseDouble(resultTable.getString(2));
             solarSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
         }
     }
