@@ -1,6 +1,10 @@
 package com.bobbylwillis.energyharvester;
 
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -30,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     BarGraphSeries<DataPoint> totalSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     BarGraphSeries<DataPoint> solarSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     BarGraphSeries<DataPoint> piezoSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
+    BluetoothAdapter mBluetoothAdapter;
+    final int REQUEST_ENABLE_BT = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,12 +50,29 @@ public class MainActivity extends AppCompatActivity {
         addData();
         //creates method for view data button
         viewData();
+        //set initial values for database
         myDb.insertData("total", "0", "0", "0");
         myDb.insertData("piezo", "0", "0", "0");
         myDb.insertData("thermal", "0", "0", "0");
         myDb.insertData("solar", "0", "0", "0");
+        bluetoothStart();
 
     }
+    private void bluetoothStart(){
+
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+
+        //
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+
+
+    }
+
     public void addData(){
         addDataBtn.setOnClickListener(
                 new View.OnClickListener() {
@@ -305,8 +328,6 @@ public class MainActivity extends AppCompatActivity {
             solarSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
         }
     }
-
-
    @Override
     protected void onResume() {
         super.onResume();
