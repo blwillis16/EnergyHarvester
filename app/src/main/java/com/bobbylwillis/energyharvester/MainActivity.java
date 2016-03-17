@@ -2,27 +2,38 @@ package com.bobbylwillis.energyharvester;
 
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Build;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
+
+import java.util.ArrayList;
+import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity {
     DatabaseHelper myDb;
@@ -30,12 +41,12 @@ public class MainActivity extends AppCompatActivity {
     EditText editPower, editVoltage, editCurrent;
     String tableType = "";
     Button addDataBtn;
+    //series variables
     BarGraphSeries<DataPoint> thermalSeries = new BarGraphSeries<DataPoint>(new DataPoint[]{new DataPoint(0,0)});
     BarGraphSeries<DataPoint> totalSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     BarGraphSeries<DataPoint> solarSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     BarGraphSeries<DataPoint> piezoSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
-    BluetoothAdapter mBluetoothAdapter;
-    final int REQUEST_ENABLE_BT = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,24 +66,21 @@ public class MainActivity extends AppCompatActivity {
         myDb.insertData("piezo", "0", "0", "0");
         myDb.insertData("thermal", "0", "0", "0");
         myDb.insertData("solar", "0", "0", "0");
-        bluetoothStart();
+
+        Button BTbutton = (Button)findViewById(R.id.bluetoothbutton);
+        BTbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activateBluetooth();
+            }
+        });
+    }
+    public void activateBluetooth(){
+
+        Intent intent = new Intent(this, DeviceScanActivity.class);
+        startActivity(intent);
 
     }
-    private void bluetoothStart(){
-
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        //
-        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-
-
-    }
-
     public void addData(){
         addDataBtn.setOnClickListener(
                 new View.OnClickListener() {
