@@ -14,6 +14,7 @@ import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,6 +48,18 @@ public class MainActivity extends AppCompatActivity {
     BarGraphSeries<DataPoint> solarSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     BarGraphSeries<DataPoint> piezoSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
 
+    private BluetoothLeUart uart;
+    private TextView messages;
+    private void writeLine(final CharSequence text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                messages.append(text);
+                messages.append("\n");
+            }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,13 +87,26 @@ public class MainActivity extends AppCompatActivity {
                 activateBluetooth();
             }
         });
+        Button BluetoothUART = (Button)findViewById(R.id.bluetoothUARTButton);
+        BluetoothUART.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activateBluetoothUART();
+            }
+        });
+
+      
     }
     public void activateBluetooth(){
-
         Intent intent = new Intent(this, DeviceScanActivity.class);
         startActivity(intent);
-
     }
+    public void activateBluetoothUART(){
+        Intent intent2 = new Intent(this, BlueUART.class);
+        startActivity(intent2);
+    }
+
+
     public void addData(){
         addDataBtn.setOnClickListener(
                 new View.OnClickListener() {
@@ -340,6 +366,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
        //thread that appends data to chart
+
         new Thread(new Runnable() {
             @Override
             public void run() {

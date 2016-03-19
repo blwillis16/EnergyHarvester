@@ -11,8 +11,8 @@
         android:id="@+id/graph"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/PowerField"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/PowerField" />
 
     <ImageButton
         android:layout_width="70dp"
@@ -148,8 +148,16 @@
         android:layout_height="wrap_content"
         android:text="Bluetooth"
         android:id="@+id/bluetoothbutton"
-        android:layout_below="@+id/textView2"
-        android:layout_toEndOf="@+id/viewDatabasebutton" />
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/piezoButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="UART"
+        android:id="@+id/bluetoothUARTButton"
+        android:layout_alignTop="@+id/CurrentField"
+        android:layout_alignEnd="@+id/bluetoothbutton" />
 
 
 </RelativeLayout>
