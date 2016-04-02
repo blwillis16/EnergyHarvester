@@ -191,10 +191,10 @@ public class BlueUART extends Activity implements BluetoothLeUart.Callback {
     public void onReceive(BluetoothLeUart uart, BluetoothGattCharacteristic rx) {
         // Called when data is received by the UART.
         byte[] dataCollected = rx.getValue();
-
         for (int i = 0; i < dataCollected.length; i += 2) {
-          int  testResult = (dataCollected[i] & 0xff) << 8 | (dataCollected[i + 1] & 0xff);
-            writeLine("Received: " + testResult);
+            int  testResult = (dataCollected[i]) << 8 | (dataCollected[i + 1]) & 0xff;
+            double actualVoltage = (6.144/32768)*testResult;
+            writeLine("Received: " + actualVoltage);
         }
  //       byte[] isAvailable = {1};
   //      isAvailable = rx.getValue();
