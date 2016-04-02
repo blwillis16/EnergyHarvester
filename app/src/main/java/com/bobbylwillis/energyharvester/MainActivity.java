@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private BluetoothLeUart uart;
     private TextView messages;
+    private static final int kActivityRequestCode_EnableBluetooth = 1;
     private void writeLine(final CharSequence text) {
         runOnUiThread(new Runnable() {
             @Override
@@ -80,13 +81,13 @@ public class MainActivity extends AppCompatActivity {
         myDb.insertData("thermal", "0", "0", "0");
         myDb.insertData("solar", "0", "0", "0");
 
-        Button BTbutton = (Button)findViewById(R.id.bluetoothbutton);
-        BTbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activateBluetooth();
-            }
-        });
+
+
+        final boolean wasBluetoothEnabled = manageBluetoothAvailability();
+        if(wasBluetoothEnabled){
+
+        }
+
         Button BluetoothUART = (Button)findViewById(R.id.bluetoothUARTButton);
         BluetoothUART.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,13 +95,8 @@ public class MainActivity extends AppCompatActivity {
                 activateBluetoothUART();
             }
         });
+    }
 
-      
-    }
-    public void activateBluetooth(){
-        Intent intent = new Intent(this, DeviceScanActivity.class);
-        startActivity(intent);
-    }
     public void activateBluetoothUART(){
         Intent intent2 = new Intent(this, BlueUART.class);
         startActivity(intent2);
@@ -112,33 +108,30 @@ public class MainActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (editPower.getText().toString() == ""|| editVoltage.getText().toString() == "" ||editCurrent.getText().toString() =="" ){
+                        if (editPower.getText().toString() == "" || editVoltage.getText().toString() == "" || editCurrent.getText().toString() == "") {
                             Toast.makeText(MainActivity.this, "Text fields left empty. Please enter a numerical value.", Toast.LENGTH_LONG).show();
                             editPower.setText("");
                             editVoltage.setText("");
                             editCurrent.setText("");
                             return;
                         }
-                        try
-                        {
+                        try {
                             // the String to int conversion happens here
                             double checkPowerNumber = Double.parseDouble(editPower.getText().toString().trim());
                             double checkVoltageNumber = Double.parseDouble(editVoltage.getText().toString().trim());
                             double checkCurrentNumber = Double.parseDouble(editCurrent.getText().toString().trim());
-                        }
-                        catch (NumberFormatException nfe)
-                        {
+                        } catch (NumberFormatException nfe) {
                             Toast.makeText(MainActivity.this, "Inserted value is not a valid number. Please enter a number.", Toast.LENGTH_LONG).show();
                             editPower.setText("");
                             editVoltage.setText("");
                             editCurrent.setText("");
                             return;
                         }
-                          boolean dataInserted =  myDb.insertData(tableType,editPower.getText().toString(),
-                                  editVoltage.getText().toString(),
-                                  editCurrent.getText().toString());
+                        boolean dataInserted = myDb.insertData(tableType, editPower.getText().toString(),
+                                editVoltage.getText().toString(),
+                                editCurrent.getText().toString());
                         //sends message was inserted
-                        if(dataInserted == true){
+                        if (dataInserted == true) {
                             Toast.makeText(MainActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
                         }
                         //if not data was inserted, send error message
@@ -388,6 +381,41 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
 
+    }
+    private boolean manageBluetoothAvailability() {
+        boolean isEnabled = true;
+
+        // Check Bluetooth HW status
+        int errorMessageId = 0;
+        final int bleStatus = BleUtils.getBleStatus(getBaseContext());
+        switch (bleStatus) {
+            case BleUtils.STATUS_BLE_NOT_AVAILABLE:
+                errorMessageId = R.string.dialog_error_no_ble;
+                isEnabled = false;
+                break;
+            case BleUtils.STATUS_BLUETOOTH_NOT_AVAILABLE: {
+                errorMessageId = R.string.dialog_error_no_bluetooth;
+                isEnabled = false;      // it was already off
+                break;
+            }
+            case BleUtils.STATUS_BLUETOOTH_DISABLED: {
+                isEnabled = false;      // it was already off
+                // if no enabled, launch settings dialog to enable it (user should always be prompted before automatically enabling bluetooth)
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, kActivityRequestCode_EnableBluetooth);
+                // execution will continue at onActivityResult()
+                break;
+            }
+        }
+        if (errorMessageId > 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog dialog = builder.setMessage(errorMessageId)
+                    .setPositiveButton(R.string.dialog_ok, null)
+                    .show();
+            //DialogUtils.keepDialogOnOrientationChanges(dialog);
+        }
+
+        return isEnabled;
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

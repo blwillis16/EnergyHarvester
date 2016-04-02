@@ -267,7 +267,6 @@ public class BluetoothLeUart extends BluetoothGattCallback implements BluetoothA
         super.onCharacteristicRead(gatt, characteristic, status);
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            //Log.w("DIS", characteristic.getStringValue(0));
             // Check if there is anything left in the queue
             BluetoothGattCharacteristic nextRequest = readQueue.poll();
             if(nextRequest != null){

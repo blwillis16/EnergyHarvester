@@ -4,6 +4,7 @@ package com.bobbylwillis.energyharvester;
         import android.app.Activity;
         import android.bluetooth.BluetoothDevice;
         import android.bluetooth.BluetoothGattCharacteristic;
+        import android.graphics.Color;
         import android.os.Bundle;
         import android.text.method.ScrollingMovementMethod;
         import android.view.Menu;
@@ -15,6 +16,8 @@ package com.bobbylwillis.energyharvester;
         import android.widget.TextView;
 
         import java.lang.Thread;
+        import java.nio.charset.Charset;
+        import java.util.ArrayList;
 
 public class BlueUART extends Activity implements BluetoothLeUart.Callback {
 
@@ -26,6 +29,8 @@ public class BlueUART extends Activity implements BluetoothLeUart.Callback {
 
     // Bluetooth LE UART instance.  This is defined in BluetoothLeUart.java.
     private BluetoothLeUart uart;
+    private volatile ArrayList<UartDataChunk> mDataBuffer = new ArrayList<UartDataChunk>();
+    private volatile int mReceivedBytes;
 
     // Write some text to the messages text view.
     // Care is taken to do this on the main UI thread so writeLine can be called from any thread
@@ -90,6 +95,14 @@ public class BlueUART extends Activity implements BluetoothLeUart.Callback {
 
         // Enable auto-scroll in the TextView
         messages.setMovementMethod(new ScrollingMovementMethod());
+
+        final Button gatherButton = (Button)findViewById(R.id.gatherDatabutton);
+       gatherButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //gatherData();
+            }
+        });
     }
 
     // OnCreate, called once to initialize the activity.
@@ -167,7 +180,7 @@ public class BlueUART extends Activity implements BluetoothLeUart.Callback {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                send = (Button)findViewById(R.id.send);
+                send = (Button) findViewById(R.id.send);
                 send.setClickable(false);
                 send.setEnabled(false);
             }
@@ -177,16 +190,41 @@ public class BlueUART extends Activity implements BluetoothLeUart.Callback {
     @Override
     public void onReceive(BluetoothLeUart uart, BluetoothGattCharacteristic rx) {
         // Called when data is received by the UART.
+        byte[] dataCollected = rx.getValue();
 
-        byte[] dataCollected = rx.getStringValue(0).getBytes();
-        int datasint2[] = {};
-        for(int i = 0; i<dataCollected.length; i++) {
-            int testResult = (dataCollected[i] & 0xff )<<8 | (dataCollected[i+1]& 0xff);
+        for (int i = 0; i < dataCollected.length; i += 2) {
+          int  testResult = (dataCollected[i] & 0xff) << 8 | (dataCollected[i + 1] & 0xff);
             writeLine("Received: " + testResult);
         }
-
+ //       byte[] isAvailable = {1};
+  //      isAvailable = rx.getValue();
+ //       if (isAvailable[0] != 1) {
+        //       }
+//       final String data = new String(dataCollected, Charset.forName("UTF-8"));
+//            UartDataChunk dataChunk = new UartDataChunk(System.currentTimeMillis(), UartDataChunk.TRANSFERMODE_TX, data);
+ //          mDataBuffer.add(dataChunk);
+//            writeLine("Received: " + data);
     }
 
+//    private void gatherData(){
+//        final int bufferSize = mDataBuffer.size();
+//       for (int i = 0; i <bufferSize; i++){
+//          final UartDataChunk storedBuffer = mDataBuffer.get(i);
+//            final int[] storedData = storedBuffer.getData();
+////            String hexData = asciiToHex(storedData);
+//           writeLine("Received: " + storedData);
+//        }
+//
+//    }
+    private String asciiToHex(String text) {
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < text.length(); i++) {
+
+            String charString = String.format("0x%02X", (byte) text.charAt(i));
+            stringBuffer.append(charString + " ");
+        }
+        return stringBuffer.toString();
+    }
     @Override
     public void onDeviceFound(BluetoothDevice device) {
         // Called when a UART device is discovered (after calling startScan).

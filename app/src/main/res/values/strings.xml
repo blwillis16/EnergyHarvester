@@ -30,4 +30,8 @@
     <string name="menu_disconnect">Disconnect</string>
     <string name="menu_scan">Scan</string>
     <string name="menu_stop">Stop</string>
+
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_error_no_ble">Bluetooth Low Energy not supported</string>
+    <string name="dialog_error_no_bluetooth">Bluetooth not available</string>
 </resources>

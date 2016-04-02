@@ -146,18 +146,10 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bluetooth"
-        android:id="@+id/bluetoothbutton"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/piezoButton" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="UART"
         android:id="@+id/bluetoothUARTButton"
-        android:layout_alignTop="@+id/CurrentField"
-        android:layout_alignEnd="@+id/bluetoothbutton" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>
