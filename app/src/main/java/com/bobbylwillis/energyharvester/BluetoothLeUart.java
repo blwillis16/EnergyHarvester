@@ -109,26 +109,26 @@ public class BluetoothLeUart extends BluetoothGattCallback implements BluetoothA
 
     public boolean deviceInfoAvailable() { return disAvailable; }
 
-    // Send data to connected UART device.
-    public void send(byte[] data) {
-        if (tx == null || data == null || data.length == 0) {
-            // Do nothing if there is no connection or message to send.
-            return;
-        }
-        // Update TX characteristic value.  Note the setValue overload that takes a byte array must be used.
-        tx.setValue(data);
-        writeInProgress = true; // Set the write in progress flag
-        gatt.writeCharacteristic(tx);
-        // ToDo: Update to include a timeout in case this goes into the weeds
-        while (writeInProgress); // Wait for the flag to clear in onCharacteristicWrite
-    }
-
-    // Send data to connected UART device.
-    public void send(String data) {
-        if (data != null && !data.isEmpty()) {
-            send(data.getBytes(Charset.forName("UTF-8")));
-        }
-    }
+//    // Send data to connected UART device.
+//    public void send(byte[] data) {
+//        if (tx == null || data == null || data.length == 0) {
+//            // Do nothing if there is no connection or message to send.
+//            return;
+//        }
+//        // Update TX characteristic value.  Note the setValue overload that takes a byte array must be used.
+//        tx.setValue(data);
+//        writeInProgress = true; // Set the write in progress flag
+//        gatt.writeCharacteristic(tx);
+//        // ToDo: Update to include a timeout in case this goes into the weeds
+//        while (writeInProgress); // Wait for the flag to clear in onCharacteristicWrite
+//    }
+//
+//    // Send data to connected UART device.
+//    public void send(String data) {
+//        if (data != null && !data.isEmpty()) {
+//            send(data.getBytes(Charset.forName("UTF-8")));
+//        }
+//    }
 
     // Register the specified callback to receive UART callbacks.
     public void registerCallback(Callback callback) {

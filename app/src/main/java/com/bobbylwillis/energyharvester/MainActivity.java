@@ -3,6 +3,7 @@ package com.bobbylwillis.energyharvester;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +37,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import java.util.ArrayList;
 import java.util.logging.Handler;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BluetoothLeUart.Callback {
     DatabaseHelper myDb;
     Button viewDatabase;
     EditText editPower, editVoltage, editCurrent;
@@ -47,10 +48,10 @@ public class MainActivity extends AppCompatActivity {
     BarGraphSeries<DataPoint> totalSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     BarGraphSeries<DataPoint> solarSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     BarGraphSeries<DataPoint> piezoSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
+    private static final int kActivityRequestCode_EnableBluetooth = 1;
 
     private BluetoothLeUart uart;
     private TextView messages;
-    private static final int kActivityRequestCode_EnableBluetooth = 1;
     private void writeLine(final CharSequence text) {
         runOnUiThread(new Runnable() {
             @Override
@@ -60,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,28 +80,28 @@ public class MainActivity extends AppCompatActivity {
         myDb.insertData("piezo", "0", "0", "0");
         myDb.insertData("thermal", "0", "0", "0");
         myDb.insertData("solar", "0", "0", "0");
-
-
+        //blue initilization for window
+        messages = (TextView) findViewById(R.id.messages2);
+        uart = new BluetoothLeUart(getApplicationContext());
+        messages.setMovementMethod(new ScrollingMovementMethod());
 
         final boolean wasBluetoothEnabled = manageBluetoothAvailability();
         if(wasBluetoothEnabled){
-
+            Button BluetoothUART = (Button)findViewById(R.id.bluetoothUARTButton);
+            BluetoothUART.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activateBluetoothUART();
+                }
+            });
         }
 
-        Button BluetoothUART = (Button)findViewById(R.id.bluetoothUARTButton);
-        BluetoothUART.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activateBluetoothUART();
-            }
-        });
     }
 
     public void activateBluetoothUART(){
         Intent intent2 = new Intent(this, BlueUART.class);
         startActivity(intent2);
     }
-
 
     public void addData(){
         addDataBtn.setOnClickListener(
@@ -117,9 +117,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         try {
                             // the String to int conversion happens here
-                            double checkPowerNumber = Double.parseDouble(editPower.getText().toString().trim());
-                            double checkVoltageNumber = Double.parseDouble(editVoltage.getText().toString().trim());
-                            double checkCurrentNumber = Double.parseDouble(editCurrent.getText().toString().trim());
+
                         } catch (NumberFormatException nfe) {
                             Toast.makeText(MainActivity.this, "Inserted value is not a valid number. Please enter a number.", Toast.LENGTH_LONG).show();
                             editPower.setText("");
@@ -381,6 +379,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
 
+       writeLine("Scanning for devices ...");
+       uart.registerCallback(this);
+       uart.connectFirstAvailable();
+
     }
     private boolean manageBluetoothAvailability() {
         boolean isEnabled = true;
@@ -417,6 +419,118 @@ public class MainActivity extends AppCompatActivity {
 
         return isEnabled;
     }
+
+    @Override
+    protected void onStop() { //was protected
+        super.onStop();
+        uart.unregisterCallback(this);
+        uart.disconnect();
+    }
+    // UART Callback event handlers.
+    @Override
+    public void onConnected(BluetoothLeUart uart) {
+        // Called when UART device is connected and ready to send/receive data.
+        writeLine("Connected!");
+    }
+
+
+    @Override
+    public void onConnectFailed(BluetoothLeUart uart) {
+        // Called when some error occured which prevented UART connection from completing.
+        writeLine("Error connecting to device!");
+    }
+
+    @Override
+    public void onDisconnected(BluetoothLeUart uart) {
+        // Called when the UART device disconnected.
+        writeLine("Disconnected!");
+    }
+
+    @Override
+    public void onReceive(BluetoothLeUart uart, BluetoothGattCharacteristic rx) {
+        // Called when data is received by the UART.
+        int flagMask = 0xc0;
+        int channelMask = 0xff;
+        int flagCheck = 0;
+        int gainCheck =0;
+        double actualGain =0;
+        int actualChannel =8;
+        int channelCheck =0;
+        double voltageResult =0;
+        double currentResult = 0;
+        double powerResult = 0;
+        byte[] dataCollected = rx.getValue();
+
+
+        for (int i = 0; i < dataCollected.length; i += 3) {
+            flagCheck = dataCollected[0] & flagMask;
+            if(flagCheck == 0xC0){
+                gainCheck = (dataCollected[0] & 0x38) >>3;
+                switch (gainCheck){
+                    case 0: actualGain = 6.144; break;
+                    case 1: actualGain = 4.069; break;
+                    case 2: actualGain = 2.048; break;
+                    case 3: actualGain = 1.024; break;
+                    case 4: actualGain = 0.512; break;
+                    case 5: actualGain = 0.256; break;
+                    default:actualGain = 0; break;
+                }
+                if(actualGain !=0){
+                    channelCheck = dataCollected[0] & 0x7;
+                    switch (channelCheck){
+                        case 0: actualChannel = 0; break;
+                        case 1: actualChannel = 1; break;
+                        case 2: actualChannel = 2; break;
+                        case 3: actualChannel = 3; break;
+                        case 4: actualChannel = 4; break;
+                        case 5: actualChannel = 5; break;
+                        case 6: actualChannel = 6; break;
+                        case 7: actualChannel = 7; break;
+                        default:actualChannel = 8; break;
+                 }
+
+                 }else{
+                    return;
+                }
+            }else{
+                return;
+            }
+            switch (actualChannel){
+                case 0: voltageResult =(actualGain/32768)*((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff) ; break;
+                case 1: voltageResult = (actualGain/32768)*((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff) ; break;
+                case 2: voltageResult = (actualGain/32768)*((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff) ; break;
+                case 3: voltageResult = (actualGain/32768)*((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff) ; break;
+                case 4: currentResult = (actualGain/32768)*(((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff)/(0.5)); break;
+                case 5: currentResult  = (actualGain/32768)*(((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff)/(0.5)); break;
+                case 6: currentResult  = (actualGain/32768)*(((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff)/(0.5)); break;
+                case 7: currentResult  = (actualGain/32768)*(((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff)/(0.5)); break;
+                default:currentResult =0; voltageResult =0; break;
+            }
+
+            powerResult = voltageResult *currentResult;
+
+//            int  testResult = (dataCollected[i]) << 8 | (dataCollected[i + 1]) & 0xff;
+//            double actualVoltage = (actualGain/32768)*testResult;
+//            writeLine("Received: " + actualVoltage);
+            myDb.insertData("total", String.valueOf(powerResult), String.valueOf(voltageResult), String.valueOf(currentResult));
+        }
+
+    }
+
+
+
+    @Override
+    public void onDeviceFound(BluetoothDevice device) {
+        // Called when a UART device is discovered (after calling startScan).
+        writeLine("Found device : " + device.getAddress());
+        writeLine("Waiting for a connection ...");
+    }
+
+    @Override
+    public void onDeviceInfoAvailable() {
+        writeLine(uart.getDeviceInfo());
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
