@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
 
     private BluetoothLeUart uart;
     private TextView messages;
+
+    int disconnect =0;
     private void writeLine(final CharSequence text) {
         runOnUiThread(new Runnable() {
             @Override
@@ -91,17 +93,13 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
             BluetoothUART.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activateBluetoothUART();
+                  disconnect = ~disconnect;
                 }
             });
         }
 
     }
 
-    public void activateBluetoothUART(){
-        Intent intent2 = new Intent(this, BlueUART.class);
-        startActivity(intent2);
-    }
 
     public void addData(){
         addDataBtn.setOnClickListener(
@@ -421,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
     }
 
     @Override
-    protected void onStop() { //was protected
+    protected void onStop() {
         super.onStop();
         uart.unregisterCallback(this);
         uart.disconnect();
@@ -432,8 +430,6 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
         // Called when UART device is connected and ready to send/receive data.
         writeLine("Connected!");
     }
-
-
     @Override
     public void onConnectFailed(BluetoothLeUart uart) {
         // Called when some error occured which prevented UART connection from completing.
@@ -451,7 +447,6 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
         // Called when data is received by the UART.
         int flagMask = 0xc0;
         int channelMask = 0xff;
-
         int flagCheck = 0;
         int gainCheck =0;
         double actualGain =0;
@@ -462,7 +457,6 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
         double voltageResult =0;
         double currentResult = 0;
         double powerResult = 0;
-
         byte[] dataCollected = rx.getValue();
 
         for (int i = 0; i < dataCollected.length; i += 3) {
@@ -580,18 +574,22 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                 }
             }
 
-
-
-//            int  testResult = (dataCollected[i]) << 8 | (dataCollected[i + 1]) & 0xff;
-//            double actualVoltage = (actualGain/32768)*testResult;
-//            writeLine("Received: " + actualVoltage);
-            if(i % 6 == 0) {
+           // && disconnect ==0
+            if(i >0 && i % 6 == 0 ) {
                 powerResult = voltageResult * currentResult;
                 myDb.insertData("total", String.valueOf(powerResult), String.valueOf(voltageResult), String.valueOf(currentResult));
             }
         }
+        //            int  testResult = (dataCollected[i]) << 8 | (dataCollected[i + 1]) & 0xff;
+//            double actualVoltage = (actualGain/32768)*testResult;
+//            writeLine("Received: " + actualVoltage);
     }
 
+    public void parseData(double gain,int channel ){
+
+
+
+    }
     @Override
     public void onDeviceFound(BluetoothDevice device) {
         // Called when a UART device is discovered (after calling startScan).
