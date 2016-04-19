@@ -109,26 +109,6 @@ public class BluetoothLeUart extends BluetoothGattCallback implements BluetoothA
 
     public boolean deviceInfoAvailable() { return disAvailable; }
 
-//    // Send data to connected UART device.
-//    public void send(byte[] data) {
-//        if (tx == null || data == null || data.length == 0) {
-//            // Do nothing if there is no connection or message to send.
-//            return;
-//        }
-//        // Update TX characteristic value.  Note the setValue overload that takes a byte array must be used.
-//        tx.setValue(data);
-//        writeInProgress = true; // Set the write in progress flag
-//        gatt.writeCharacteristic(tx);
-//        // ToDo: Update to include a timeout in case this goes into the weeds
-//        while (writeInProgress); // Wait for the flag to clear in onCharacteristicWrite
-//    }
-//
-//    // Send data to connected UART device.
-//    public void send(String data) {
-//        if (data != null && !data.isEmpty()) {
-//            send(data.getBytes(Charset.forName("UTF-8")));
-//        }
-//    }
 
     // Register the specified callback to receive UART callbacks.
     public void registerCallback(Callback callback) {
@@ -220,6 +200,7 @@ public class BluetoothLeUart extends BluetoothGattCallback implements BluetoothA
         disHWRev = gatt.getService(DIS_UUID).getCharacteristic(DIS_HWREV_UUID);
         disSWRev = gatt.getService(DIS_UUID).getCharacteristic(DIS_SWREV_UUID);
 
+
         // Add device information characteristics to the read queue
         // These need to be queued because we have to wait for the response to the first
         // read request before a second one can be processed (which makes you wonder why they
@@ -231,6 +212,9 @@ public class BluetoothLeUart extends BluetoothGattCallback implements BluetoothA
 
         // Request a dummy read to get the device information queue going
         gatt.readCharacteristic(disManuf);
+//        if(disModel.getStringValue(0)!= "BLEFRIEND32"){
+//            connectFirstAvailable();
+//        }
 
         // Setup notifications on RX characteristic changes (i.e. data received).
         // First call setCharacteristicNotification to enable notification.

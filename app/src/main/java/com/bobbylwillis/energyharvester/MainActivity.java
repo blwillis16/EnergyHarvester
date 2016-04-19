@@ -451,21 +451,27 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
         // Called when data is received by the UART.
         int flagMask = 0xc0;
         int channelMask = 0xff;
+
         int flagCheck = 0;
         int gainCheck =0;
         double actualGain =0;
         int actualChannel =8;
         int channelCheck =0;
+        boolean isVoltage = true;
+
         double voltageResult =0;
         double currentResult = 0;
         double powerResult = 0;
+
         byte[] dataCollected = rx.getValue();
 
-
         for (int i = 0; i < dataCollected.length; i += 3) {
-            flagCheck = dataCollected[0] & flagMask;
+
+            Log.w("DIS", "The length is " + dataCollected.length);
+            flagCheck = dataCollected[i] & flagMask;
+
             if(flagCheck == 0xC0){
-                gainCheck = (dataCollected[0] & 0x38) >>3;
+                gainCheck = (dataCollected[i] & 0x38) >>3;
                 switch (gainCheck){
                     case 0: actualGain = 6.144; break;
                     case 1: actualGain = 4.069; break;
@@ -476,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                     default:actualGain = 0; break;
                 }
                 if(actualGain !=0){
-                    channelCheck = dataCollected[0] & 0x7;
+                    channelCheck = dataCollected[i] & 0x7;
                     switch (channelCheck){
                         case 0: actualChannel = 0; break;
                         case 1: actualChannel = 1; break;
@@ -487,37 +493,104 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                         case 6: actualChannel = 6; break;
                         case 7: actualChannel = 7; break;
                         default:actualChannel = 8; break;
-                 }
-
+                    }
                  }else{
                     return;
                 }
             }else{
                 return;
             }
-            switch (actualChannel){
-                case 0: voltageResult =(actualGain/32768)*((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff) ; break;
-                case 1: voltageResult = (actualGain/32768)*((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff) ; break;
-                case 2: voltageResult = (actualGain/32768)*((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff) ; break;
-                case 3: voltageResult = (actualGain/32768)*((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff) ; break;
-                case 4: currentResult = (actualGain/32768)*(((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff)/(0.5)); break;
-                case 5: currentResult  = (actualGain/32768)*(((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff)/(0.5)); break;
-                case 6: currentResult  = (actualGain/32768)*(((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff)/(0.5)); break;
-                case 7: currentResult  = (actualGain/32768)*(((dataCollected[i+1]) << 8 | (dataCollected[i + 2]) & 0xff)/(0.5)); break;
-                default:currentResult =0; voltageResult =0; break;
+
+            if(isVoltage== true) {
+                switch (actualChannel) {
+                    case 0:
+                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                        isVoltage = false;
+                        break;
+                    case 1:
+                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                        isVoltage = false;
+                        break;
+                    case 2:
+                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                        isVoltage = false;
+                        break;
+                    case 3:
+                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                        isVoltage = false;
+                        break;
+                    case 4:
+                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                        isVoltage = false;
+                        break;
+                    case 5:
+                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                        isVoltage = false;
+                        break;
+                    case 6:
+                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                        isVoltage = false;
+                        break;
+                    case 7:
+                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                        isVoltage = false;
+                        break;
+                    default:
+                        isVoltage = false;
+                        break;
+                }
+            }
+            if(isVoltage == false) {
+                switch (actualChannel) {
+                    case 0:
+                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
+                        isVoltage = true;
+                        break;
+                    case 1:
+                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
+                        isVoltage = true;
+                        break;
+                    case 2:
+                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
+                        isVoltage = true;
+                        break;
+                    case 3:
+                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
+                        isVoltage = true;
+                        break;
+                    case 4:
+                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
+                        isVoltage = true;
+                        break;
+                    case 5:
+                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
+                        isVoltage = true;
+                        break;
+                    case 6:
+                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
+                        isVoltage = true;
+                        break;
+                    case 7:
+                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
+                        isVoltage = true;
+                        break;
+                    default:
+                        isVoltage = true;;
+                        break;
+                }
             }
 
-            powerResult = voltageResult *currentResult;
+
 
 //            int  testResult = (dataCollected[i]) << 8 | (dataCollected[i + 1]) & 0xff;
 //            double actualVoltage = (actualGain/32768)*testResult;
 //            writeLine("Received: " + actualVoltage);
-            myDb.insertData("total", String.valueOf(powerResult), String.valueOf(voltageResult), String.valueOf(currentResult));
+            if(i % 6 == 0) {
+                powerResult = voltageResult * currentResult;
+                myDb.insertData("total", String.valueOf(powerResult), String.valueOf(voltageResult), String.valueOf(currentResult));
+            }
         }
-
     }
-
-
 
     @Override
     public void onDeviceFound(BluetoothDevice device) {
