@@ -446,24 +446,21 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
     public void onReceive(BluetoothLeUart uart, BluetoothGattCharacteristic rx) {
         // Called when data is received by the UART.
         int flagMask = 0xc0;
-        int channelMask = 0xff;
         int flagCheck = 0;
         int gainCheck =0;
         double actualGain =0;
         int actualChannel =8;
         int channelCheck =0;
         boolean isVoltage = true;
-
         double voltageResult =0;
         double currentResult = 0;
         double powerResult = 0;
         byte[] dataCollected = rx.getValue();
+        String receiveTableType ="";
 
         for (int i = 0; i < dataCollected.length; i += 3) {
-
-            Log.w("DIS", "The length is " + dataCollected.length);
+            Log.w("DIS", "Packet length: " + dataCollected.length);
             flagCheck = dataCollected[i] & flagMask;
-
             if(flagCheck == 0xC0){
                 gainCheck = (dataCollected[i] & 0x38) >>3;
                 switch (gainCheck){
@@ -494,95 +491,75 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
             }else{
                 return;
             }
-
-            if(isVoltage== true) {
+                if(isVoltage == true){
                 switch (actualChannel) {
-                    case 0:
-                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                        isVoltage = false;
-                        break;
-                    case 1:
-                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                        isVoltage = false;
-                        break;
-                    case 2:
-                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                        isVoltage = false;
-                        break;
-                    case 3:
-                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                        isVoltage = false;
-                        break;
-                    case 4:
-                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                        isVoltage = false;
-                        break;
-                    case 5:
-                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                        isVoltage = false;
-                        break;
-                    case 6:
-                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                        isVoltage = false;
-                        break;
-                    case 7:
-                        voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                        isVoltage = false;
-                        break;
-                    default:
-                        isVoltage = false;
-                        break;
-                }
-            }
-            if(isVoltage == false) {
-                switch (actualChannel) {
-                    case 0:
-                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
-                        isVoltage = true;
-                        break;
-                    case 1:
-                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
-                        isVoltage = true;
-                        break;
-                    case 2:
-                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
-                        isVoltage = true;
-                        break;
-                    case 3:
-                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
-                        isVoltage = true;
-                        break;
-                    case 4:
-                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
-                        isVoltage = true;
-                        break;
-                    case 5:
-                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
-                        isVoltage = true;
-                        break;
-                    case 6:
-                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
-                        isVoltage = true;
-                        break;
-                    case 7:
-                        currentResult = (actualGain / 32768) * (((dataCollected[i + 4]) << 8 | (dataCollected[i + 5]) & 0xff) / (0.5));
-                        isVoltage = true;
-                        break;
-                    default:
-                        isVoltage = true;;
-                        break;
-                }
-            }
-
+                case 0:
+                    voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                    isVoltage =false;
+                    break;
+                case 1:
+                    voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                    isVoltage =false;
+                    break;
+                case 2:
+                    voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                    isVoltage =false;
+                    break;
+                case 3:
+                    voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                    isVoltage =false;
+                    break;
+                case 4:
+                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    receiveTableType = "solar";
+                    break;
+                case 5:
+                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    receiveTableType = "thermal";
+                    break;
+                case 6:
+                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    receiveTableType = "piezo";
+                    break;
+                case 7:
+                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    receiveTableType = "total";
+                    break;
+                default:
+                    break;
+            }}
+            if(isVoltage ==false){
+            switch (actualChannel) {
+                case 0:
+                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    receiveTableType = "solar";
+                    isVoltage = true;
+                    break;
+                case 1:
+                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    receiveTableType = "thermal";
+                    isVoltage = true;
+                    break;
+                case 2:
+                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    receiveTableType = "piezo";
+                    isVoltage = true;
+                    break;
+                case 3:
+                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    receiveTableType = "total";
+                    break;
+                default:
+                    break;
+            }}
            // && disconnect ==0
-            if(i >0 && i % 6 == 0 ) {
+            if(i %5  == 0 ) {
                 powerResult = voltageResult * currentResult;
-                myDb.insertData("total", String.valueOf(powerResult), String.valueOf(voltageResult), String.valueOf(currentResult));
+                Log.w("DIS", "Channel: " +actualChannel+" Voltage: " + voltageResult + " Current: "+ currentResult+ " power: " +powerResult);
+                myDb.insertData(receiveTableType, String.valueOf(powerResult), String.valueOf(voltageResult), String.valueOf(currentResult));
+                voltageResult =0;currentResult =0;
             }
         }
-        //            int  testResult = (dataCollected[i]) << 8 | (dataCollected[i + 1]) & 0xff;
-//            double actualVoltage = (actualGain/32768)*testResult;
-//            writeLine("Received: " + actualVoltage);
     }
 
     public void parseData(double gain,int channel ){
