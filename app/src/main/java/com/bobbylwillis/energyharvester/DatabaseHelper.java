@@ -90,6 +90,24 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
         return dataResult;
     }
+    public void clearTable(String Table)   {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String whichTable ="";
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(column3, 0);
+        contentValues.put(column4, 0);
+        contentValues.put(column5, 0);
+
+        switch (Table){
+            case "total": whichTable =tableName1; db.insert(tableName1, null, contentValues);break;
+            case "solar":  whichTable =tableName2;db.insert(tableName2, null, contentValues); break;
+            case "piezo":  whichTable =tableName3; db.insert(tableName3, null, contentValues);break;
+            case "thermal":whichTable =tableName4; db.insert(tableName4, null, contentValues);break;
+            default:break;
+        }
+        db.execSQL("delete from "+ whichTable);
+
+    }
     //set up data
     public Cursor getTotalData(){
         SQLiteDatabase db = this.getWritableDatabase();

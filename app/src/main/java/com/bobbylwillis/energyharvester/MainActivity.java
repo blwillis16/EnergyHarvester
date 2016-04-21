@@ -4,26 +4,18 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.os.Build;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -31,11 +23,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
-
-import java.util.ArrayList;
-import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity implements BluetoothLeUart.Callback {
     DatabaseHelper myDb;
@@ -43,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
     EditText editPower, editVoltage, editCurrent;
     String tableType = "";
     Button addDataBtn;
+    Button clearDataBtn;
     //series variables
     BarGraphSeries<DataPoint> thermalSeries = new BarGraphSeries<DataPoint>(new DataPoint[]{new DataPoint(0,0)});
     BarGraphSeries<DataPoint> totalSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
@@ -52,8 +43,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
 
     private BluetoothLeUart uart;
     private TextView messages;
-
-    int disconnect =0;
+     boolean addingDataStatus = true;
+    boolean dataconnectionStatus =false;
     private void writeLine(final CharSequence text) {
         runOnUiThread(new Runnable() {
             @Override
@@ -89,11 +80,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
 
         final boolean wasBluetoothEnabled = manageBluetoothAvailability();
         if(wasBluetoothEnabled){
-            Button BluetoothUART = (Button)findViewById(R.id.bluetoothUARTButton);
+            Button BluetoothUART = (Button)findViewById(R.id.collectDataButton);
             BluetoothUART.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                  disconnect = ~disconnect;
+                  dataconnectionStatus = !dataconnectionStatus;
                 }
             });
         }
@@ -141,6 +132,14 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                     }
                 }
         );
+
+        clearDataBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addingDataStatus = false;
+                myDb.clearTable(tableType);
+            }
+        });
     }
 
     public void viewData(){
@@ -293,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
               //  addEntry();
                 graph.setTitle("Piezo Harvester Power vs Time");
                 piezoSeries.setColor(Color.BLUE);
-                piezoSeries.setSpacing(50);
+                //piezoSeries.setSpacing(50);
                 graph.addSeries(piezoSeries);
             }
         });
@@ -319,36 +318,41 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
         //add data and view database buttons
         addDataBtn = (Button)findViewById(R.id.addDataButton);
         viewDatabase = (Button)findViewById(R.id.viewDatabasebutton);
+        clearDataBtn = (Button)findViewById(R.id.clearButton);
 
 
     }
     private void addEntry() {
         double doublePower;
-
+        int currentID;
         if(tableType.equals("total")) {
             Cursor resultTable = myDb.getTotalData();
             resultTable.moveToLast();
             doublePower = Double.parseDouble(resultTable.getString(2));
-            totalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
-            //totalSeries.appendData(new DataPoint(1, doublePower), true, 2);
+            currentID = Integer.parseInt(resultTable.getString(0));
+           totalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
+          //  totalSeries.appendData(new DataPoint(currentID, doublePower), true, 2);
         }
         if(tableType.equals("piezo")) {
             Cursor resultTable = myDb.getPiezoData();
             resultTable.moveToLast();
             doublePower = Double.parseDouble(resultTable.getString(2));
-            piezoSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
+            piezoSeries.resetData(new DataPoint[]{new DataPoint(0, 0), new DataPoint(0, doublePower)});
+            //piezoSeries.appendData(new DataPoint(1, doublePower), true, 2);
         }
         if(tableType.equals("thermal")) {
             Cursor resultTable = myDb.getThermalData();
             resultTable.moveToLast();
             doublePower = Double.parseDouble(resultTable.getString(2));
             thermalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
+           // thermalSeries.appendData(new DataPoint(1, doublePower), true, 2);
         }
         if(tableType.equals("solar")) {
             Cursor resultTable = myDb.getSolarData();
             resultTable.moveToLast();
             doublePower = Double.parseDouble(resultTable.getString(2));
-            solarSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
+            solarSeries.resetData(new DataPoint[]{new DataPoint(0, 0), new DataPoint(0, doublePower)});
+            //solarSeries.appendData(new DataPoint(1, doublePower), true, 2);
         }
     }
    @Override
@@ -364,7 +368,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            addEntry();
+                            if(addingDataStatus == true){
+                            addEntry();}
                         }
                     });
                     //Sleep added to slow down additions to graph
@@ -553,7 +558,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                     break;
             }}
            // && disconnect ==0
-            if(i %5  == 0 ) {
+            if(dataconnectionStatus==true && i %5  == 0 ) {
                 powerResult = voltageResult * currentResult;
                 Log.w("DIS", "Channel: " +actualChannel+" Voltage: " + voltageResult + " Current: "+ currentResult+ " power: " +powerResult);
                 myDb.insertData(receiveTableType, String.valueOf(powerResult), String.valueOf(voltageResult), String.valueOf(currentResult));
@@ -562,11 +567,6 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
         }
     }
 
-    public void parseData(double gain,int channel ){
-
-
-
-    }
     @Override
     public void onDeviceFound(BluetoothDevice device) {
         // Called when a UART device is discovered (after calling startScan).

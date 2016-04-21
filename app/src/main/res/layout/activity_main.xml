@@ -65,10 +65,8 @@
         android:layout_height="wrap_content"
         android:text="View Database"
         android:id="@+id/viewDatabasebutton"
-        android:layout_above="@+id/homeBtn"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="71dp" />
+        android:layout_above="@+id/clearButton"
+        android:layout_alignEnd="@+id/piezoButton" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -76,9 +74,8 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Voltage"
         android:id="@+id/textView2"
-        android:layout_above="@+id/addDataButton"
-        android:layout_alignRight="@+id/textView3"
-        android:layout_alignEnd="@+id/textView3" />
+        android:layout_above="@+id/CurrentField"
+        android:layout_alignEnd="@+id/textView4" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -137,17 +134,16 @@
         android:layout_height="wrap_content"
         android:text="Add Data"
         android:id="@+id/addDataButton"
-        android:layout_alignBottom="@+id/textView4"
-        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/textView4"
         android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bluetooth"
-        android:id="@+id/bluetoothUARTButton"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:text="Collect Data"
+        android:id="@+id/collectDataButton"
+        android:layout_below="@+id/viewDatabasebutton"
+        android:layout_toEndOf="@+id/addDataButton" />
 
     <TextView
         android:id="@+id/messages2"
@@ -159,6 +155,15 @@
         android:scrollbarAlwaysDrawVerticalTrack="true"
         android:gravity="bottom"
         android:layout_above="@+id/viewDatabasebutton"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/collectDataButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="clear"
+        android:id="@+id/clearButton"
+        android:layout_above="@+id/addDataButton"
         android:layout_alignParentStart="true" />
 
 
