@@ -465,6 +465,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
 
         for (int i = 0; i < dataCollected.length; i += 3) {
             Log.w("DIS", "Packet length: " + dataCollected.length);
+            Log.w("DIS", "Flag Byte: " + dataCollected[i]);
             flagCheck = dataCollected[i] & flagMask;
             if(flagCheck == 0xC0){
                 gainCheck = (dataCollected[i] & 0x38) >>3;
@@ -478,25 +479,26 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                     default:actualGain = 0; break;
                 }
                 if(actualGain !=0){
-                    channelCheck = dataCollected[i] & 0x7;
-                    switch (channelCheck){
-                        case 0: actualChannel = 0; break;
-                        case 1: actualChannel = 1; break;
-                        case 2: actualChannel = 2; break;
-                        case 3: actualChannel = 3; break;
-                        case 4: actualChannel = 4; break;
-                        case 5: actualChannel = 5; break;
-                        case 6: actualChannel = 6; break;
-                        case 7: actualChannel = 7; break;
-                        default:actualChannel = 8; break;
-                    }
+                    actualChannel = dataCollected[i] & 0x7;
+                    Log.w("DIS", "CHANNEL# : " + actualChannel);
+//                    switch (channelCheck){
+//                        case 0: actualChannel = 0; break;
+//                        case 1: actualChannel = 1; break;
+//                        case 2: actualChannel = 2; break;
+//                        case 3: actualChannel = 3; break;
+//                        case 4: actualChannel = 4; break;
+//                        case 5: actualChannel = 5; break;
+//                        case 6: actualChannel = 6; break;
+//                        case 7: actualChannel = 7; break;
+//                        default:actualChannel = 8; break;
+//                    }
                  }else{
                     return;
                 }
             }else{
                 return;
             }
-                if(isVoltage == true){
+
                 switch (actualChannel) {
                 case 0:
                     voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
@@ -515,50 +517,55 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                     isVoltage =false;
                     break;
                 case 4:
-                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    currentResult = 1 ;
+//                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
                     receiveTableType = "solar";
                     break;
                 case 5:
-                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    currentResult = 1 ;
+//                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
                     receiveTableType = "thermal";
                     break;
                 case 6:
-                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    currentResult = 1 ;
+//                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
                     receiveTableType = "piezo";
                     break;
                 case 7:
-                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+                    currentResult = 1 ;
+//                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
                     receiveTableType = "total";
                     break;
                 default:
                     break;
-            }}
-            if(isVoltage ==false){
-            switch (actualChannel) {
-                case 0:
-                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
-                    receiveTableType = "solar";
-                    isVoltage = true;
-                    break;
-                case 1:
-                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
-                    receiveTableType = "thermal";
-                    isVoltage = true;
-                    break;
-                case 2:
-                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
-                    receiveTableType = "piezo";
-                    isVoltage = true;
-                    break;
-                case 3:
-                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
-                    receiveTableType = "total";
-                    break;
-                default:
-                    break;
-            }}
+            }
+//            if(isVoltage ==false){
+//            switch (actualChannel) {
+//                case 0:
+//                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+//                    receiveTableType = "solar";
+//                    isVoltage = true;
+//                    break;
+//                case 1:
+//                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+//                    receiveTableType = "thermal";
+//                    isVoltage = true;
+//                    break;
+//                case 2:
+//                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+//                    receiveTableType = "piezo";
+//                    isVoltage = true;
+//                    break;
+//                case 3:
+//                    currentResult = (actualGain / 32768) * (((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff) / (0.5));
+//                    receiveTableType = "total";
+//                    break;
+//                default:
+//                    break;
+//            }}
            // && disconnect ==0
-            if(dataconnectionStatus==true && i %5  == 0 ) {
+
+            if(dataconnectionStatus==true && i %3  == 0 && i!=0 ) {
                 powerResult = voltageResult * currentResult;
                 Log.w("DIS", "Channel: " +actualChannel+" Voltage: " + voltageResult + " Current: "+ currentResult+ " power: " +powerResult);
                 myDb.insertData(receiveTableType, String.valueOf(powerResult), String.valueOf(voltageResult), String.valueOf(currentResult));
