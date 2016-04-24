@@ -27,7 +27,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".BluetoothLeUart" />
-        <activity android:name=".BlueUART" />
         <activity android:name=".BleUtils" />
 
     </application>
