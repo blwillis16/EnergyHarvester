@@ -17,33 +17,34 @@ import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 
 public class MainActivity extends AppCompatActivity implements BluetoothLeUart.Callback {
-    DatabaseHelper myDb;
+    DatabaseHelper  myDb;
     Button viewDatabase;
     EditText editPower, editVoltage, editCurrent;
     String tableType = "";
     Button addDataBtn;
     Button clearDataBtn;
     //series variables
-    BarGraphSeries<DataPoint> thermalSeries = new BarGraphSeries<DataPoint>(new DataPoint[]{new DataPoint(0,0)});
-    BarGraphSeries<DataPoint> totalSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
-    BarGraphSeries<DataPoint> solarSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
-    BarGraphSeries<DataPoint> piezoSeries = new BarGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
+    LineGraphSeries<DataPoint> thermalSeries = new LineGraphSeries<DataPoint>(new DataPoint[]{new DataPoint(0,0)});
+    LineGraphSeries<DataPoint> totalSeries = new LineGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
+    LineGraphSeries<DataPoint> solarSeries = new LineGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
+    LineGraphSeries<DataPoint> piezoSeries = new LineGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     private static final int kActivityRequestCode_EnableBluetooth = 1;
 
     private BluetoothLeUart uart;
     private TextView messages;
-     boolean addingDataStatus = true;
+    boolean addingDataStatus = true;
     boolean dataconnectionStatus =false;
     private void writeLine(final CharSequence text) {
         runOnUiThread(new Runnable() {
@@ -80,19 +81,32 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
 
         final boolean wasBluetoothEnabled = manageBluetoothAvailability();
         if(wasBluetoothEnabled){
-            Button BluetoothUART = (Button)findViewById(R.id.collectDataButton);
-            BluetoothUART.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                  dataconnectionStatus = !dataconnectionStatus;
+            ToggleButton BluetoothUART = (ToggleButton)findViewById(R.id.collectDataButton);
+            BluetoothUART.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        // The toggle is enabled
+                        dataconnectionStatus = true;
+                    } else {
+                        // The toggle is disabled
+                        dataconnectionStatus = false;
+                    }
                 }
             });
+
+
+//            BluetoothUART.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                  dataconnectionStatus = !dataconnectionStatus;
+//                }
+//            });
         }
 
     }
 
-
     public void addData(){
+
         addDataBtn.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -114,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                             editCurrent.setText("");
                             return;
                         }
+
                         boolean dataInserted = myDb.insertData(tableType, editPower.getText().toString(),
                                 editVoltage.getText().toString(),
                                 editCurrent.getText().toString());
@@ -162,11 +177,15 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                             }
 
                             while (res1.moveToNext()) {
-                                buffer.append("ID: " + res1.getString(0) + "\n");
-                                buffer.append("DateTime: " + res1.getString(1) + "\n");
-                                buffer.append("Power: " + res1.getString(2) + "\n");
-                                buffer.append("Voltage: " + res1.getString(3) + "\n");
-                                buffer.append("Current: " + res1.getString(4) + "\n\n");
+                                buffer.append("ID: " + res1.getString(0) + " DateTime: "
+                                        + res1.getString(1)+ " Power: "
+                                        + res1.getString(2) + " Voltage: "
+                                        + res1.getString(3)+ " Current: "
+                                        + res1.getString(4)+"\n\n");
+//                                buffer.append("DateTime: " + res1.getString(1) + "\n");
+//                                buffer.append("Power: " + res1.getString(2) + "\n");
+//                                buffer.append("Voltage: " + res1.getString(3) + "\n");
+//                                buffer.append("Current: " + res1.getString(4) + "\n\n");
                             }
                         }
                         if (tableType.equals("piezo")) {
@@ -330,29 +349,32 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
             resultTable.moveToLast();
             doublePower = Double.parseDouble(resultTable.getString(2));
             currentID = Integer.parseInt(resultTable.getString(0));
-           totalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
-          //  totalSeries.appendData(new DataPoint(currentID, doublePower), true, 2);
+           //totalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
+            totalSeries.appendData(new DataPoint(currentID, doublePower), true, 20);
         }
         if(tableType.equals("piezo")) {
             Cursor resultTable = myDb.getPiezoData();
             resultTable.moveToLast();
             doublePower = Double.parseDouble(resultTable.getString(2));
-            piezoSeries.resetData(new DataPoint[]{new DataPoint(0, 0), new DataPoint(0, doublePower)});
-            //piezoSeries.appendData(new DataPoint(1, doublePower), true, 2);
+            currentID = Integer.parseInt(resultTable.getString(0));
+           // piezoSeries.resetData(new DataPoint[]{new DataPoint(0, 0), new DataPoint(0, doublePower)});
+            piezoSeries.appendData(new DataPoint(currentID, doublePower), true, 2);
         }
         if(tableType.equals("thermal")) {
             Cursor resultTable = myDb.getThermalData();
             resultTable.moveToLast();
             doublePower = Double.parseDouble(resultTable.getString(2));
-            thermalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
-           // thermalSeries.appendData(new DataPoint(1, doublePower), true, 2);
+            currentID = Integer.parseInt(resultTable.getString(0));
+           // thermalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
+            thermalSeries.appendData(new DataPoint(currentID, doublePower), true, 2);
         }
         if(tableType.equals("solar")) {
             Cursor resultTable = myDb.getSolarData();
             resultTable.moveToLast();
             doublePower = Double.parseDouble(resultTable.getString(2));
-            solarSeries.resetData(new DataPoint[]{new DataPoint(0, 0), new DataPoint(0, doublePower)});
-            //solarSeries.appendData(new DataPoint(1, doublePower), true, 2);
+            currentID = Integer.parseInt(resultTable.getString(0));
+            //solarSeries.resetData(new DataPoint[]{new DataPoint(0, 0), new DataPoint(0, doublePower)});
+            solarSeries.appendData(new DataPoint(currentID, doublePower), true, 2);
         }
     }
    @Override
@@ -364,11 +386,11 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
             @Override
             public void run() {
                 //100 data points
-                for (int i = 0; i<100; i++){
+                for (int i = 0; i<100001; i++){
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(addingDataStatus == true){
+                            if(addingDataStatus ==true){
                             addEntry();}
                         }
                     });
@@ -502,19 +524,19 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                 switch (actualChannel) {
                 case 0:
                     voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                    isVoltage =false;
+
                     break;
                 case 1:
                     voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                    isVoltage =false;
+
                     break;
                 case 2:
                     voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                    isVoltage =false;
+
                     break;
                 case 3:
                     voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
-                    isVoltage =false;
+
                     break;
                 case 4:
                     currentResult = 1 ;
@@ -565,7 +587,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
 //            }}
            // && disconnect ==0
 
-            if(dataconnectionStatus==true && i %3  == 0 && i!=0 ) {
+            if(dataconnectionStatus && i %3  == 0 && i!=0 ) {
                 powerResult = voltageResult * currentResult;
                 Log.w("DIS", "Channel: " +actualChannel+" Voltage: " + voltageResult + " Current: "+ currentResult+ " power: " +powerResult);
                 myDb.insertData(receiveTableType, String.valueOf(powerResult), String.valueOf(voltageResult), String.valueOf(currentResult));
