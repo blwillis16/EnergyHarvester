@@ -25,6 +25,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 
@@ -40,8 +41,12 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
     LineGraphSeries<DataPoint> totalSeries = new LineGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     LineGraphSeries<DataPoint> solarSeries = new LineGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
     LineGraphSeries<DataPoint> piezoSeries = new LineGraphSeries<DataPoint>(new DataPoint[] {new DataPoint(0,0)});
+
+
     private static final int kActivityRequestCode_EnableBluetooth = 1;
 
+
+    String receiveTableType ="";
     private BluetoothLeUart uart;
     private TextView messages;
     boolean addingDataStatus = true;
@@ -95,13 +100,13 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
             });
 
 
-//            BluetoothUART.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                  dataconnectionStatus = !dataconnectionStatus;
-//                }
-//            });
-        }
+//                    BluetoothUART.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            dataconnectionStatus = !dataconnectionStatus;
+//                        }
+//                    });
+                }
 
     }
 
@@ -111,6 +116,10 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if(tableType ==""){
+                            Toast.makeText(MainActivity.this, "Please select a graph", Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         if (editPower.getText().toString() == "" || editVoltage.getText().toString() == "" || editCurrent.getText().toString() == "") {
                             Toast.makeText(MainActivity.this, "Text fields left empty. Please enter a numerical value.", Toast.LENGTH_LONG).show();
                             editPower.setText("");
@@ -177,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                             }
 
                             while (res1.moveToNext()) {
-                                buffer.append("ID: " + res1.getString(0) + " DateTime: "
+                                buffer.append("ID: " + res1.getString(0) + " Date: "
                                         + res1.getString(1)+ " Power: "
                                         + res1.getString(2) + " Voltage: "
                                         + res1.getString(3)+ " Current: "
@@ -198,11 +207,17 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                             }
 
                             while (res2.moveToNext()) {
-                                buffer.append("ID: " + res2.getString(0) + "\n");
-                                buffer.append("DateTime: " + res2.getString(1) + "\n");
-                                buffer.append("Power: " + res2.getString(2) + "\n");
-                                buffer.append("Voltage: " + res2.getString(3) + "\n");
-                                buffer.append("Current: " + res2.getString(4) + "\n\n");
+                                buffer.append("ID: " + res2.getString(0) + " Date: "
+                                        + res2.getString(1)+ " Power: "
+                                        + res2.getString(2) + " Voltage: "
+                                        + res2.getString(3)+ " Current: "
+                                        + res2.getString(4)+"\n\n");
+
+//                                buffer.append("ID: " + res2.getString(0) + "\n");
+//                                buffer.append("DateTime: " + res2.getString(1) + "\n");
+//                                buffer.append("Power: " + res2.getString(2) + "\n");
+//                                buffer.append("Voltage: " + res2.getString(3) + "\n");
+//                                buffer.append("Current: " + res2.getString(4) + "\n\n");
                             }
 
 
@@ -217,11 +232,16 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                             }
 
                             while (res3.moveToNext()) {
-                                buffer.append("ID: " + res3.getString(0) + "\n");
-                                buffer.append("DateTime: " + res3.getString(1) + "\n");
-                                buffer.append("Power: " + res3.getString(2) + "\n");
-                                buffer.append("Voltage: " + res3.getString(3) + "\n");
-                                buffer.append("Current: " + res3.getString(4) + "\n\n");
+                                buffer.append("ID: " + res3.getString(0) + " Date: "
+                                        + res3.getString(1)+ " Power: "
+                                        + res3.getString(2) + " Voltage: "
+                                        + res3.getString(3)+ " Current: "
+                                        + res3.getString(4)+"\n\n");
+//                                buffer.append("ID: " + res3.getString(0) + "\n");
+//                                buffer.append("DateTime: " + res3.getString(1) + "\n");
+//                                buffer.append("Power: " + res3.getString(2) + "\n");
+//                                buffer.append("Voltage: " + res3.getString(3) + "\n");
+//                                buffer.append("Current: " + res3.getString(4) + "\n\n");
                             }
 
                         }
@@ -235,11 +255,16 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                             }
 
                             while (res4.moveToNext()) {
-                                buffer.append("ID: " + res4.getString(0) + "\n");
-                                buffer.append("DateTime: " + res4.getString(1) + "\n");
-                                buffer.append("Power: " + res4.getString(2) + "\n");
-                                buffer.append("Voltage: " + res4.getString(3) + "\n");
-                                buffer.append("Current: " + res4.getString(4) + "\n\n");
+                                buffer.append("ID: " + res4.getString(0) + " Date: "
+                                        + res4.getString(1)+ " Power: "
+                                        + res4.getString(2) + " Voltage: "
+                                        + res4.getString(3)+ " Current: "
+                                        + res4.getString(4)+"\n\n");
+//                                buffer.append("ID: " + res4.getString(0) + "\n");
+//                                buffer.append("DateTime: " + res4.getString(1) + "\n");
+//                                buffer.append("Power: " + res4.getString(2) + "\n");
+//                                buffer.append("Voltage: " + res4.getString(3) + "\n");
+//                                buffer.append("Current: " + res4.getString(4) + "\n\n");
                             }
                         }
                         //show all data
@@ -263,8 +288,15 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
         final GraphView graph = (GraphView) findViewById(R.id.graph);
 
         //labels vertical and horizontal axis of graph
-        graph.getGridLabelRenderer().setVerticalAxisTitle("Power(uW)");
+        graph.getGridLabelRenderer().setVerticalAxisTitle("Voltage(V)");
         graph.getGridLabelRenderer().setHorizontalAxisTitle("Time(s)");
+
+        //  Custom Viewport
+        Viewport viewport = graph.getViewport();
+        viewport.setXAxisBoundsManual(false);
+     //   viewport.setYAxisBoundsManual(true);
+     //   viewport.setMinX(0);
+        viewport.setMinY(0);
 
         //creates instance for each respective button
         ImageButton homeButton = (ImageButton) findViewById(R.id.homeBtn);
@@ -280,8 +312,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                 //resets graph
                 graph.removeAllSeries();
                 //addEntry();
-                graph.setTitle("Total Harvester Power vs Time");
+                graph.setTitle("Total Harvester Voltage vs Time");
                 totalSeries.setColor(Color.GREEN);
+                totalSeries.setDrawBackground(true);
                 graph.addSeries(totalSeries);
             }
         });
@@ -297,8 +330,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                 graph.removeAllSeries();
                 //generate new points
                // addEntry();
-                graph.setTitle("Thermal Harvester Power vs Time");
+                graph.setTitle("Thermal Harvester Voltage vs Time");
                 thermalSeries.setColor(Color.RED);
+                thermalSeries.setDrawBackground(true);
                 graph.addSeries(thermalSeries);
 
             }
@@ -309,8 +343,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                 tableType = "piezo";
                 graph.removeAllSeries();
               //  addEntry();
-                graph.setTitle("Piezo Harvester Power vs Time");
-                piezoSeries.setColor(Color.BLUE);
+                graph.setTitle("Piezo Harvester Voltage vs Time");
+                piezoSeries.setColor(Color.BLUE); piezoSeries.setDrawBackground(true);
                 //piezoSeries.setSpacing(50);
                 graph.addSeries(piezoSeries);
             }
@@ -323,8 +357,9 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                 graph.removeAllSeries();
                // addEntry();
                 //adds new data points
-                graph.setTitle("Solar Harvester Power vs Time");
+                graph.setTitle("Solar Harvester Voltage vs Time");
                 solarSeries.setColor(Color.YELLOW);
+                solarSeries.setDrawBackground(true);
                 graph.addSeries(solarSeries);
             }
         });
@@ -342,40 +377,40 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
 
     }
     private void addEntry() {
-        double doublePower;
-        int currentID;
-        if(tableType.equals("total")) {
-            Cursor resultTable = myDb.getTotalData();
-            resultTable.moveToLast();
-            doublePower = Double.parseDouble(resultTable.getString(2));
-            currentID = Integer.parseInt(resultTable.getString(0));
-           //totalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
-            totalSeries.appendData(new DataPoint(currentID, doublePower), true, 20);
-        }
-        if(tableType.equals("piezo")) {
-            Cursor resultTable = myDb.getPiezoData();
-            resultTable.moveToLast();
-            doublePower = Double.parseDouble(resultTable.getString(2));
-            currentID = Integer.parseInt(resultTable.getString(0));
-           // piezoSeries.resetData(new DataPoint[]{new DataPoint(0, 0), new DataPoint(0, doublePower)});
-            piezoSeries.appendData(new DataPoint(currentID, doublePower), true, 2);
-        }
-        if(tableType.equals("thermal")) {
-            Cursor resultTable = myDb.getThermalData();
-            resultTable.moveToLast();
-            doublePower = Double.parseDouble(resultTable.getString(2));
-            currentID = Integer.parseInt(resultTable.getString(0));
-           // thermalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
-            thermalSeries.appendData(new DataPoint(currentID, doublePower), true, 2);
-        }
-        if(tableType.equals("solar")) {
-            Cursor resultTable = myDb.getSolarData();
-            resultTable.moveToLast();
-            doublePower = Double.parseDouble(resultTable.getString(2));
-            currentID = Integer.parseInt(resultTable.getString(0));
-            //solarSeries.resetData(new DataPoint[]{new DataPoint(0, 0), new DataPoint(0, doublePower)});
-            solarSeries.appendData(new DataPoint(currentID, doublePower), true, 2);
-        }
+//        double doublePower;
+//        int currentID;
+//        if(tableType.equals("total")) {
+//            Cursor resultTable = myDb.getTotalData();
+//            resultTable.moveToLast();
+//            doublePower = Double.parseDouble(resultTable.getString(2));
+//            currentID = Integer.parseInt(resultTable.getString(0));
+//           //totalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
+//            totalSeries.appendData(new DataPoint(currentID, doublePower), true, 512);
+//        }
+//        if(tableType.equals("piezo")) {
+//            Cursor resultTable = myDb.getPiezoData();
+//            resultTable.moveToLast();
+//            doublePower = Double.parseDouble(resultTable.getString(2));
+//            currentID = Integer.parseInt(resultTable.getString(0));
+//           // piezoSeries.resetData(new DataPoint[]{new DataPoint(0, 0), new DataPoint(0, doublePower)});
+//            piezoSeries.appendData(new DataPoint(currentID, doublePower), true, 512);
+//        }
+//        if(tableType.equals("thermal")) {
+//            Cursor resultTable = myDb.getThermalData();
+//            resultTable.moveToLast();
+//            doublePower = Double.parseDouble(resultTable.getString(2));
+//            currentID = Integer.parseInt(resultTable.getString(0));
+//           // thermalSeries.resetData(new DataPoint[]{new DataPoint(0,0), new DataPoint(0,doublePower)});
+//            thermalSeries.appendData(new DataPoint(currentID, doublePower), true, 512);
+//        }
+//        if(tableType.equals("solar")) {
+//            Cursor resultTable = myDb.getSolarData();
+//            resultTable.moveToLast();
+//            doublePower = Double.parseDouble(resultTable.getString(2));
+//            currentID = Integer.parseInt(resultTable.getString(0));
+//            //solarSeries.resetData(new DataPoint[]{new DataPoint(0, 0), new DataPoint(0, doublePower)});
+//            solarSeries.appendData(new DataPoint(currentID, doublePower), true, 512);
+//        }
     }
    @Override
     protected void onResume() {
@@ -396,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                     });
                     //Sleep added to slow down additions to graph
                     try {
-                        Thread.sleep(600);
+                        Thread.sleep(100);
                     } catch (InterruptedException e) {
                        // e.printStackTrace();
                     }
@@ -483,7 +518,8 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
         double currentResult = 0;
         double powerResult = 0;
         byte[] dataCollected = rx.getValue();
-        String receiveTableType ="";
+
+
 
         for (int i = 0; i < dataCollected.length; i += 3) {
             Log.w("DIS", "Packet length: " + dataCollected.length);
@@ -591,7 +627,41 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
                 powerResult = voltageResult * currentResult;
                 Log.w("DIS", "Channel: " +actualChannel+" Voltage: " + voltageResult + " Current: "+ currentResult+ " power: " +powerResult);
                 myDb.insertData(receiveTableType, String.valueOf(powerResult), String.valueOf(voltageResult), String.valueOf(currentResult));
+                double doublePower;
+                int currentID;
+
+                if(addingDataStatus ==true){
+
+                switch(receiveTableType){
+                    case"total":
+                        Cursor resultTable1 = myDb.getTotalData();
+                        resultTable1.moveToLast();
+                        doublePower = Double.parseDouble(resultTable1.getString(2));
+                        currentID = Integer.parseInt(resultTable1.getString(0));
+                        totalSeries.appendData(new DataPoint(currentID, doublePower), true, 512);break;
+                    case"solar": Cursor resultTable2 = myDb.getSolarData();
+                        resultTable2.moveToLast();
+                        doublePower = Double.parseDouble(resultTable2.getString(2));
+                        currentID = Integer.parseInt(resultTable2.getString(0));
+
+                        solarSeries.appendData(new DataPoint(currentID, doublePower), true, 512);break;
+                    case"piezo":
+                        Cursor resultTable3 = myDb.getPiezoData();
+                        resultTable3.moveToLast();
+                        doublePower = Double.parseDouble(resultTable3.getString(2));
+                        currentID = Integer.parseInt(resultTable3.getString(0));piezoSeries.appendData(new DataPoint(currentID, doublePower), true, 512);break;
+                    case"thermal":
+                        Cursor resultTable4 = myDb.getThermalData();
+                        resultTable4.moveToLast();
+                        doublePower = Double.parseDouble(resultTable4.getString(2));
+                        currentID = Integer.parseInt(resultTable4.getString(0));
+                        thermalSeries.appendData(new DataPoint(currentID, doublePower), true, 512);break;
+                    default: break;
+
+                }}
                 voltageResult =0;currentResult =0;
+
+
             }
         }
     }
