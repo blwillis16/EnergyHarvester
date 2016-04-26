@@ -571,7 +571,7 @@ public class MainActivity extends AppCompatActivity implements BluetoothLeUart.C
 
                     break;
                 case 3:
-                    voltageResult = (actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
+                    voltageResult = (2.5)*(actualGain / 32768) * ((dataCollected[i + 1]) << 8 | (dataCollected[i + 2]) & 0xff);
 
                     break;
                 case 4:
